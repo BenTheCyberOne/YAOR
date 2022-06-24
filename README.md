@@ -7,7 +7,7 @@ Please note nearly everything in this repo was taken from another source, or mod
 
 These won't look neat or fancy but they get the job done and will hopefully help you!
 
-#Acknowledgements
+# Acknowledgements
 Swissky and everyone who worked on the "PayloadAllTheThings" repo, with the Windows and AD attack/privesc cheat sheets being attached to the "Windows_Privesc" and "AD" sheets
 
 adsecurity.org for mimikatz/AD tips
